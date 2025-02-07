@@ -5,3 +5,7 @@ In future I will visit or come back
 - to discuss the math behind RNNs and LSTMs
 - implement LSTMs the same way I did for RNNs
 - discuss the attention and augemented RNNs
+
+
+--------------------------------------------
+1. ![NFD](uploads/UAX15-NormFig3.jpg)
