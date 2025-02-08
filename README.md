@@ -8,7 +8,7 @@ In future I will visit or come back
 
 
 --------------------------------------------
-![NFD](uploads/UAX15-NormFig3.jpg)
+![NFD](uploads/UAX15-NormFig3.jpg)  
 `git pull origin main`
 
 --------------------------------------------
