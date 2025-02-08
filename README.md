@@ -8,4 +8,8 @@ In future I will visit or come back
 
 
 --------------------------------------------
-1. ![NFD](uploads/UAX15-NormFig3.jpg)
+![NFD](uploads/UAX15-NormFig3.jpg)
+`git pull origin main`
+
+--------------------------------------------
+think of a neuron as a tree and go to the root
