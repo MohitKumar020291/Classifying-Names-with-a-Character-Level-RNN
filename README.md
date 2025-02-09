@@ -10,6 +10,8 @@ In future I will visit or come back
 --------------------------------------------
 ![NFD](uploads/UAX15-NormFig3.jpg)  
 `git pull origin main`
+`git log --oneline origin/<branch_name>..<branch_name>` - local branch has changes not pushed to github
+`git log --oneline <branch_name>..origin/<branch_name>` - need to pull the changes
 
 --------------------------------------------
 think of a neuron as a tree and go to the root
