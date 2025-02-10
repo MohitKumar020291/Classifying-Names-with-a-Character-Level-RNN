@@ -14,4 +14,4 @@ In future I will visit or come back
 `git log --oneline <branch_name>..origin/<branch_name>` - need to pull the changes   
 
 --------------------------------------------
-Have an idea of ![Pytorch AutoGrad](https://pytorch.org/tutorials/beginner/blitz/autograd_tutorial.html)
+Have an idea of [Pytorch AutoGrad](https://pytorch.org/tutorials/beginner/blitz/autograd_tutorial.html)
