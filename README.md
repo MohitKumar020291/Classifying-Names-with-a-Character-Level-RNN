@@ -15,3 +15,6 @@ In future I will visit or come back
 
 --------------------------------------------
 Have an idea of [Pytorch AutoGrad](https://pytorch.org/tutorials/beginner/blitz/autograd_tutorial.html)
+
+--------------------------------------------
+1. A basic Neuron backpropagator is done.
