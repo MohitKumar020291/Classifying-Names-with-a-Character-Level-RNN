@@ -1,4 +1,4 @@
-from typing import Union
+from typing import Union, Optional
 import math
 
 naked_attributes = []
@@ -73,13 +73,20 @@ class Value:
 
 class Neuron:
     "A neuron in a typical neural network"
-    def __init__(self, value: Value):
-        self.neuron_value = value
-        self.neuron_rvalue = value.raw_value
+    def __init__(self, value: Optional[Value]=None, next=False, prev_neuron: Optional["Neuron"]=None):
+        if isinstance(value, Value):
+            self.neuron_value = value
+            self.neuron_rvalue = value.raw_value
         self.attrs = []
         self.grads = []
         self.cousins = {}
-        self.__call__()
+        if not next:
+            self.__call__()
+        else:
+            if prev_neuron != None:
+                self.prev_neuron = prev_neuron
+            else:
+                raise Exception("Cannot go to next neuron without a previous neuron.")
 
     #for multiply operation
     def __mul__(self, value: Union[Value, any]) -> "Neuron":
@@ -157,6 +164,17 @@ class Neuron:
                 topo = []
         dfs(source)
         return topos
+    
+    def neuron_next_step(self, op='next', idxd_nnw=None):
+        #creates a neuron in the next step
+        if op == "next":
+            if idxd_nnw != None:
+                new_neuron = Neuron(next=True, prev_neuron=self)
+                new_neuron.neuron_value = idxd_nnw * self.neuron_value
+                new_neuron.neuron_rvalue = new_neuron.neuron_value.raw_value
+                new_neuron()
+                for attr in new_neuron.attrs:
+                    print(attr.raw_value)
 
     def __call__(self):
         self.attrs = [value for value in self.neuron_value.children]

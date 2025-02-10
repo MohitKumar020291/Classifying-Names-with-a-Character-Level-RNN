@@ -18,3 +18,4 @@ Have an idea of [Pytorch AutoGrad](https://pytorch.org/tutorials/beginner/blitz/
 
 --------------------------------------------
 1. A basic Neuron backpropagator is done.
+Changes - return a new neuron
