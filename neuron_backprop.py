@@ -1,4 +1,8 @@
 from typing import Union
+import math
+
+naked_attributes = []
+their_vals = []
 
 class Value:
     "Each neuron is a value"
@@ -16,28 +20,56 @@ class Value:
         self.children = children
         self.grads = []
         self.parents = []
+    
+    def make_other_valid(self, other) -> "Value":
+        if not isinstance(other, Value):
+            if other not in naked_attributes:
+                naked_attributes.append(other)
+                other = Value(other)      
+                their_vals.append(other)
+            else:
+                other = their_vals[naked_attributes.index(other)]
+        return other
 
     def __mul__(self, other) -> "Value":
         new_data = self.raw_value * other.raw_value if isinstance(other, Value) else self.raw_value * other
         new_data_val = Value(new_data)
-        other = Value(other, other) if not isinstance(other, Value) else other
+        other = self.make_other_valid(other)
         new_value = Value(new_data_val, new_data, '*', children=[self, other])
         new_value.grads = [other, self]
 
         self.parents.append(new_value)
         other.parents.append(new_value)
         return new_value
+   
+    def __rmul__(self, other):
+        return self * other
 
     def __add__(self, other) -> "Value":
         new_data = self.raw_value + other.raw_value if isinstance(other, Value) else self.raw_value + other
         new_data_val = Value(new_data)
-        other = Value(other, other) if not isinstance(other, Value) else other
+        other = self.make_other_valid(other)
         new_value = Value(new_data_val, new_data, '+', children=[self, other])
         new_value.grads = [1, 1]
 
         self.parents.append(new_value)
         other.parents.append(new_value)
         return new_value
+
+    def __radd__(self, other):
+        return self + other
+    
+    def log(self):
+        if self.raw_value <= 0:
+            raise Exception(f"log of negative value: {self.raw_value}, is undefined. At least I cannot calculate it.")
+        else:
+            new_data = math.log(self.raw_value)
+            new_data_val = Value(new_data, )
+            new_value = Value(new_data_val, new_data, '*', children=[self])
+            new_value.grads = [1/self.raw_value]
+            self.parents.append(new_value)
+            return new_value
+
 
 class Neuron:
     "A neuron in a typical neural network"
@@ -50,49 +82,44 @@ class Neuron:
         self.__call__()
 
     #for multiply operation
-    def __mul__(self, value: Union[Value, any]):
-        if isinstance(value, Value):
-            if value in self.attrs:
-                value_idx = self.attrs.index(value)
-                grad_value = self.grads[value_idx]
-                new_grad_value = self.neuron_value + value * grad_value
-                self.grads[value_idx] = new_grad_value
-                self.neuron_value *= value.raw_value
-                self.neuron_rvalue *= value.raw_value
-                for cousin in self.cousins[value]:
-                    cousin_idx = self.attrs.index(cousin)
-                    cousin_grad = self.grads[cousin_idx]
-                    new_grad_cousin = value * cousin_grad
-                    self.grads[cousin_idx] = new_grad_cousin
-        else:
-            pass
+    def __mul__(self, value: Union[Value, any]) -> "Neuron":
+        new_value = self.neuron_value * value
+        self.neuron_value = new_value
+        self.neuron_rvalue = new_value.raw_value
+        self.get_roots_and_update_attrs_()
+        self.update_grad(transformation='*')
+        return self
     
-    def __add__(self, value: Value) -> None:
+    def __add__(self, value: Union[Value, any]) -> "Neuron":
         new_value = self.neuron_value + value
         self.neuron_value = new_value
         self.neuron_rvalue = new_value.raw_value
+        self.get_roots_and_update_attrs_()
+        self.update_grad(transformation='+')
+        return self
+        # return None
+
+    def get_roots_and_update_attrs_(self) -> None:
         children = self.neuron_value.children.copy()
-        root_childrens = []
+        root_children = []
         while children:
             child = children.pop(0)
             if child.value == child.raw_value:
-                root_childrens.append(child)
+                root_children.append(child)
             if child.children != []:
                 children.extend(child.children)
-        for child in root_childrens:
+        for child in root_children:
             if child not in self.attrs:
                 self.attrs.append(child)
                 self.grads.append(0)
 
-        del children
-
-        return self.update_grad(transformation='+')
-        # return None
+        del children, root_children
+        return None
 
     def update_grad(self, transformation=None) -> None:
         if transformation == None:
             raise Exception("update_grad was called without providing transformation")
-        if transformation == '+':
+        else:
             topos = []
             for attr in self.attrs:
                 topo = self.till_neuron(attr)
@@ -115,7 +142,6 @@ class Neuron:
                 
                 self.grads[idx] = current_grad
                 idx += 1
-        return topos
 
     def till_neuron(self, source: Value):
         topos = []
@@ -139,15 +165,3 @@ class Neuron:
             attrs = self.attrs.copy()
             attrs.remove(attr)
             self.cousins[attr] = attrs
-
-
-w = Value(2)
-x = Value(3)
-neuron = Neuron(w * x)
-x_new = Value(5)
-neuron + w * x_new
-x_new_1 = Value(4)
-neuron + w * x_new_1
-neuron + w * x_new_1
-
-print(neuron.grads)
